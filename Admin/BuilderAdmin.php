@@ -30,9 +30,15 @@ class BuilderAdmin extends Admin
 
     public const BUILDER_VIEW = 'sulu_builder.builder';
 
-    private ViewBuilderFactoryInterface $viewBuilderFactory;
+    /**
+     * @var ViewBuilderFactoryInterface
+     */
+    private $viewBuilderFactory;
 
-    private SecurityCheckerInterface $securityChecker;
+    /**
+     * @var SecurityCheckerInterface
+     */
+    private $securityChecker;
 
     public function __construct(
         ViewBuilderFactoryInterface $viewBuilderFactory,

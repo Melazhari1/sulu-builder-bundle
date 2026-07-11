@@ -26,7 +26,10 @@ use Xxp\SuluBuilderBundle\Service\TemplateXmlManager;
  */
 class TemplateController
 {
-    private TemplateXmlManager $templateXmlManager;
+    /**
+     * @var TemplateXmlManager
+     */
+    private $templateXmlManager;
 
     public function __construct(TemplateXmlManager $templateXmlManager)
     {

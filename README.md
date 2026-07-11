@@ -6,7 +6,7 @@ Sulu Administration navigation. The view lists the XML templates of your project
 JSON admin API to read and write those templates, ready to be extended into a full
 visual template builder.
 
-- Compatible with **Sulu 2.4 – 2.6**, PHP >= 8.0, Symfony 5.4 / 6.x
+- Compatible with **Sulu 2.4 – 2.6**, PHP >= 7.2, Symfony 5.4 / 6.x
 - PSR-4 / PSR-12 compliant
 - Uses only the Sulu Admin React ecosystem (no extra UI framework)
 - Permissions integrated with Sulu's security contexts (Settings → User roles)

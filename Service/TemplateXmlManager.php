@@ -21,12 +21,15 @@ use Xxp\SuluBuilderBundle\Exception\TemplateNotFoundException;
  */
 class TemplateXmlManager
 {
-    private string $projectDir;
+    /**
+     * @var string
+     */
+    private $projectDir;
 
     /**
      * @var array<string, string> Map of template type => directory relative to the project dir.
      */
-    private array $templateDirectories;
+    private $templateDirectories;
 
     /**
      * @param array<string, string> $templateDirectories
@@ -69,7 +72,9 @@ class TemplateXmlManager
 
         \usort(
             $templates,
-            static fn (array $a, array $b) => [$a['type'], $a['key']] <=> [$b['type'], $b['key']]
+            static function (array $a, array $b) {
+                return [$a['type'], $a['key']] <=> [$b['type'], $b['key']];
+            }
         );
 
         return $templates;
