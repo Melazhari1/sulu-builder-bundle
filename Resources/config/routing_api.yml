@@ -1,0 +1,14 @@
+sulu_builder.cget_templates:
+    path: /builder/templates
+    methods: [GET]
+    controller: Xxp\SuluBuilderBundle\Controller\Admin\TemplateController::cgetAction
+
+sulu_builder.get_template:
+    path: /builder/templates/{type}/{key}
+    methods: [GET]
+    controller: Xxp\SuluBuilderBundle\Controller\Admin\TemplateController::getAction
+
+sulu_builder.put_template:
+    path: /builder/templates/{type}/{key}
+    methods: [PUT]
+    controller: Xxp\SuluBuilderBundle\Controller\Admin\TemplateController::putAction

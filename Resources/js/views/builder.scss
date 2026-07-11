@@ -1,0 +1,28 @@
+.builder {
+    padding: 30px 50px;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.title {
+    margin: 20px 0 30px;
+    font-size: 26px;
+    line-height: 32px;
+    font-weight: normal;
+}
+
+.message {
+    color: #999;
+}
+
+.loaderContainer {
+    display: flex;
+    justify-content: center;
+    padding: 50px 0;
+}
+
+@media (max-width: 700px) {
+    .builder {
+        padding: 20px;
+    }
+}

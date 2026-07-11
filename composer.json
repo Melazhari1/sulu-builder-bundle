@@ -1,0 +1,35 @@
+{
+    "name": "melazhari/sulu-builder-bundle",
+    "description": "Sulu Builder - manage and build Sulu XML templates from a native Sulu Administration view.",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "keywords": ["sulu", "sulu-bundle", "admin", "templates", "xml"],
+    "authors": [
+        {
+            "name": "XXP"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "sulu/sulu": "^2.4",
+        "symfony/config": "^5.4 || ^6.0",
+        "symfony/dependency-injection": "^5.4 || ^6.0",
+        "symfony/http-foundation": "^5.4 || ^6.0",
+        "symfony/http-kernel": "^5.4 || ^6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Xxp\\SuluBuilderBundle\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Resources/",
+            "/Tests/"
+        ]
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.0-dev"
+        }
+    },
+    "minimum-stability": "stable"
+}

@@ -1,0 +1,12 @@
+{
+    "sulu_builder.title": "Sulu Builder",
+    "sulu_builder.templates": "XML templates",
+    "sulu_builder.reload": "Reload",
+    "sulu_builder.loading_error": "The templates could not be loaded.",
+    "sulu_builder.no_templates": "No XML templates were found in the configured directories.",
+    "sulu_builder.template_key": "Key",
+    "sulu_builder.template_type": "Type",
+    "sulu_builder.template_path": "Path",
+    "sulu_builder.template_size": "Size",
+    "sulu_builder.template_modified": "Last modified"
+}

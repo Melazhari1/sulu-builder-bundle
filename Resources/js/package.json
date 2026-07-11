@@ -1,0 +1,7 @@
+{
+    "name": "sulu-builder-bundle",
+    "version": "1.0.0",
+    "description": "Admin UI for the SuluBuilderBundle. Compiled by the Sulu Administration webpack build.",
+    "main": "index.js",
+    "private": true
+}
