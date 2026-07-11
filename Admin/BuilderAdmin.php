@@ -20,6 +20,7 @@ use Sulu\Bundle\AdminBundle\Admin\View\ViewBuilderFactoryInterface;
 use Sulu\Bundle\AdminBundle\Admin\View\ViewCollection;
 use Sulu\Component\Security\Authorization\PermissionTypes;
 use Sulu\Component\Security\Authorization\SecurityCheckerInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Registers the "Sulu Builder" navigation item and its Administration view.
@@ -40,12 +41,19 @@ class BuilderAdmin extends Admin
      */
     private $securityChecker;
 
+    /**
+     * @var UrlGeneratorInterface
+     */
+    private $urlGenerator;
+
     public function __construct(
         ViewBuilderFactoryInterface $viewBuilderFactory,
-        SecurityCheckerInterface $securityChecker
+        SecurityCheckerInterface $securityChecker,
+        UrlGeneratorInterface $urlGenerator
     ) {
         $this->viewBuilderFactory = $viewBuilderFactory;
         $this->securityChecker = $securityChecker;
+        $this->urlGenerator = $urlGenerator;
     }
 
     public function configureNavigationItems(NavigationItemCollection $navigationItemCollection): void
@@ -72,6 +80,26 @@ class BuilderAdmin extends Admin
             $this->viewBuilderFactory
                 ->createViewBuilder(static::BUILDER_VIEW, '/builder', static::BUILDER_VIEW)
         );
+    }
+
+    public function getConfigKey(): ?string
+    {
+        return 'sulu_builder';
+    }
+
+    /**
+     * Exposes the API endpoints to the frontend so that no URL (including the
+     * admin prefix, "/admin" by default) has to be hard-coded in JavaScript.
+     *
+     * @return mixed[]
+     */
+    public function getConfig(): ?array
+    {
+        return [
+            'endpoints' => [
+                'templates' => $this->urlGenerator->generate('sulu_builder.cget_templates'),
+            ],
+        ];
     }
 
     /**

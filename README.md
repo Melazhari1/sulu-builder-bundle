@@ -18,6 +18,7 @@ visual template builder.
 ```
 SuluBuilderBundle/
 ├── composer.json                              Package definition (type: symfony-bundle, PSR-4: Xxp\SuluBuilderBundle\)
+├── INSTALL.md                                 Step-by-step installation instructions
 ├── SuluBuilderBundle.php                      Bundle class (entry point registered in config/bundles.php)
 │
 ├── Admin/
@@ -46,7 +47,8 @@ SuluBuilderBundle/
     │   └── admin.fr.json                      automatically by the Sulu admin translation endpoint)
     └── js/                                    Frontend package compiled by the Sulu admin webpack build
         ├── package.json                       npm package manifest ("sulu-builder-bundle")
-        ├── index.js                           Registers the view in Sulu's viewRegistry
+        ├── index.js                           Registers the view in Sulu's viewRegistry and the config hook
+        ├── config.js                          Endpoint config, filled at boot from BuilderAdmin::getConfig()
         └── views/
             ├── Builder.js                     React view (mobx + Sulu components: Breadcrumb, Table,
             │                                  Loader, withToolbar) — the "Sulu Builder" page
@@ -60,123 +62,28 @@ How the pieces connect:
 2. `Resources/js/index.js` registers the React component under that same key in the
    `viewRegistry` — this is how Sulu knows which component to render.
 3. `BuilderAdmin::configureNavigationItems()` adds the navigation entry pointing at the view.
-4. The React view calls `GET /admin/api/builder/templates`, handled by
+4. `BuilderAdmin::getConfig()` generates the API URLs from the named routes and hands
+   them to the frontend at boot time (`initializer.addUpdateConfigHook` in
+   `Resources/js/index.js`) — so the admin prefix (`/admin` by default) is **dynamic**,
+   never hard-coded in JavaScript.
+5. The React view calls the templates endpoint, handled by
    `TemplateController` → `TemplateXmlManager`.
 
 ---
 
-## 2. Installation (PHP side)
+## 2. Installation
 
-### 2.1 Require the bundle
+Full step-by-step instructions (composer, bundle registration, routing, frontend
+build, permissions, troubleshooting) live in **[INSTALL.md](INSTALL.md)**.
 
-The bundle is not on Packagist, so add it as a *path repository*. Copy the
-`SuluBuilderBundle/` directory into your Sulu project (e.g. `bundles/SuluBuilderBundle`)
-and add to the **project's** `composer.json`:
-
-```json
-{
-    "repositories": [
-        { "type": "path", "url": "bundles/SuluBuilderBundle" }
-    ]
-}
-```
-
-Then:
-
-```bash
-composer require melazhari/sulu-builder-bundle:"*@dev"
-```
-
-### 2.2 Register the bundle
-
-In `config/bundles.php`:
-
-```php
-return [
-    // ...
-    Xxp\SuluBuilderBundle\SuluBuilderBundle::class => ['all' => true],
-];
-```
-
-### 2.3 Register the API routes
-
-Create `config/routes/sulu_builder_admin.yaml`:
-
-```yaml
-sulu_builder_api:
-    resource: "@SuluBuilderBundle/Resources/config/routing_api.yml"
-    prefix: /admin/api
-```
-
-(The `/builder` admin view route itself needs **no** Symfony route — Sulu's admin SPA
-router creates it from `BuilderAdmin`.)
-
-### 2.4 Optional configuration
-
-Defaults scan `config/templates/pages` and `config/templates/snippets`. Override in
-`config/packages/sulu_builder.yaml`:
-
-```yaml
-sulu_builder:
-    template_directories:
-        page: config/templates/pages
-        snippet: config/templates/snippets
-        form: config/templates/forms
-```
-
-### 2.5 Clear the cache
-
-```bash
-bin/console cache:clear
-```
+The admin URL prefix is **dynamic**: the API routes take whatever prefix you choose
+when importing `Resources/config/routing_api.yml` (default `/admin/api`), and the
+React view receives the resulting URLs at runtime via `BuilderAdmin::getConfig()`.
+Projects mounting the Administration on a custom path only adjust the routing prefix.
 
 ---
 
-## 3. Building the Administration frontend
-
-Sulu's admin UI is a single webpack build living in `assets/admin` of your project.
-
-### 3.1 Register the JS package
-
-In `assets/admin/package.json` add the dependency (path relative to `assets/admin`):
-
-```json
-{
-    "dependencies": {
-        "sulu-builder-bundle": "file:../../vendor/melazhari/sulu-builder-bundle/Resources/js"
-    }
-}
-```
-
-### 3.2 Import it in the admin entry point
-
-In `assets/admin/app.js` (or `index.js`, depending on your skeleton version):
-
-```js
-// existing imports…
-import 'sulu-builder-bundle';
-```
-
-> Alternative without npm package: skip 3.1 and import by relative path instead:
-> `import '../../vendor/melazhari/sulu-builder-bundle/Resources/js';`
-
-### 3.3 Build
-
-```bash
-cd assets/admin
-npm install
-npm run build        # production build
-# or during development:
-npm run watch
-```
-
-> Note: once you customize the admin UI you must build it yourself —
-> `bin/adminconsole sulu:admin:update-build` (which downloads the pre-built default
-> bundle) can no longer be used.
-
----
-
-## 4. Permissions
+## 3. Permissions
 
 The bundle registers the security context `sulu.builder.templates` under the
 **"Sulu Builder"** group. After installation, go to
@@ -186,7 +93,10 @@ the *View* permission.
 
 ---
 
-## 5. API
+## 4. API
+
+URLs below assume the default `/admin/api` prefix — they follow whatever prefix your
+project uses for the routing import.
 
 | Method | URL                                        | Description                                |
 |--------|--------------------------------------------|--------------------------------------------|
@@ -196,7 +106,7 @@ the *View* permission.
 
 ---
 
-## 6. Extending
+## 5. Extending
 
 - **New template types**: add a directory to `sulu_builder.template_directories`.
 - **New views** (e.g. an edit view): add a `createViewBuilder()` call in

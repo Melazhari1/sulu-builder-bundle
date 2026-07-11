@@ -6,9 +6,8 @@ import {Breadcrumb, Loader, Table} from 'sulu-admin-bundle/components';
 import {withToolbar} from 'sulu-admin-bundle/containers';
 import {Requester} from 'sulu-admin-bundle/services';
 import {translate} from 'sulu-admin-bundle/utils';
+import builderConfig from '../config';
 import builderStyles from './builder.scss';
-
-const TEMPLATES_ENDPOINT = '/admin/api/builder/templates';
 
 /**
  * The "Sulu Builder" Administration view.
@@ -30,7 +29,7 @@ class Builder extends React.Component<{}> {
         this.loading = true;
         this.error = false;
 
-        Requester.get(TEMPLATES_ENDPOINT)
+        Requester.get(builderConfig.endpoints.templates)
             .then(action((response) => {
                 this.templates = response._embedded.templates;
                 this.loading = false;

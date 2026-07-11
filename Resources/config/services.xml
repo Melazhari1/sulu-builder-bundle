@@ -8,6 +8,7 @@
         <service id="sulu_builder.admin" class="Xxp\SuluBuilderBundle\Admin\BuilderAdmin">
             <argument type="service" id="sulu_admin.view_builder_factory"/>
             <argument type="service" id="sulu_security.security_checker"/>
+            <argument type="service" id="router"/>
 
             <tag name="sulu.admin"/>
         </service>
