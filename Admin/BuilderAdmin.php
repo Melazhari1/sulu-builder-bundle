@@ -20,6 +20,7 @@ use Sulu\Bundle\AdminBundle\Admin\View\ViewBuilderFactoryInterface;
 use Sulu\Bundle\AdminBundle\Admin\View\ViewCollection;
 use Sulu\Component\Security\Authorization\PermissionTypes;
 use Sulu\Component\Security\Authorization\SecurityCheckerInterface;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -95,9 +96,26 @@ class BuilderAdmin extends Admin
      */
     public function getConfig(): ?array
     {
+        try {
+            $templatesUrl = $this->urlGenerator->generate('sulu_builder.cget_templates');
+        } catch (RouteNotFoundException $exception) {
+            // The project has not imported Resources/config/routing_api.yml yet
+            // (INSTALL.md step 3). Degrade gracefully instead of breaking the
+            // whole administration: the frontend falls back to its default
+            // endpoint, and the missing routes surface as a warning.
+            @\trigger_error(
+                'SuluBuilderBundle: route "sulu_builder.cget_templates" is not registered.'
+                . ' Import "@SuluBuilderBundle/Resources/config/routing_api.yml" in config/routes/'
+                . ' (see INSTALL.md step 3) and clear the cache.',
+                \E_USER_WARNING
+            );
+
+            return null;
+        }
+
         return [
             'endpoints' => [
-                'templates' => $this->urlGenerator->generate('sulu_builder.cget_templates'),
+                'templates' => $templatesUrl,
             ],
         ];
     }

@@ -197,3 +197,8 @@ item stays hidden for users without *View*.
 
   `install.php` detects the symlink and missing-target cases and prints a warning.
 - **404 on the API** → routes file missing or wrong prefix (step 3).
+- **`Unable to generate a URL for the named route "sulu_builder.cget_templates"`** →
+  same cause: the routes were never imported. Create
+  `config/routes/sulu_builder_admin.yaml` (step 3) and run `bin/console cache:clear`.
+  Since v1.0.6 the bundle degrades to a warning in the logs instead of failing, but the
+  API stays unavailable until the routes are registered.
