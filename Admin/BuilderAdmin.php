@@ -32,6 +32,8 @@ class BuilderAdmin extends Admin
 
     public const BUILDER_VIEW = 'sulu_builder.builder';
 
+    public const EDIT_VIEW = 'sulu_builder.builder_edit';
+
     /**
      * @var ViewBuilderFactoryInterface
      */
@@ -80,6 +82,11 @@ class BuilderAdmin extends Admin
         $viewCollection->add(
             $this->viewBuilderFactory
                 ->createViewBuilder(static::BUILDER_VIEW, '/builder', static::BUILDER_VIEW)
+        );
+
+        $viewCollection->add(
+            $this->viewBuilderFactory
+                ->createViewBuilder(static::EDIT_VIEW, '/builder/:type/:key', static::EDIT_VIEW)
         );
     }
 

@@ -2,7 +2,7 @@
 import React from 'react';
 import {action, observable} from 'mobx';
 import {observer} from 'mobx-react';
-import {Breadcrumb, Loader, Table} from 'sulu-admin-bundle/components';
+import {Breadcrumb, Icon, Loader, Table} from 'sulu-admin-bundle/components';
 import {withToolbar} from 'sulu-admin-bundle/containers';
 import {Requester} from 'sulu-admin-bundle/services';
 import {translate} from 'sulu-admin-bundle/utils';
@@ -24,6 +24,10 @@ class Builder extends React.Component<{}> {
     componentDidMount() {
         this.load();
     }
+
+    handleEdit = (type: string, key: string) => {
+        this.props.router.navigate('sulu_builder.builder_edit', {type, key});
+    };
 
     @action load = () => {
         this.loading = true;
@@ -57,14 +61,34 @@ class Builder extends React.Component<{}> {
                     <Table.HeaderCell>{translate('sulu_builder.template_type')}</Table.HeaderCell>
                     <Table.HeaderCell>{translate('sulu_builder.template_path')}</Table.HeaderCell>
                     <Table.HeaderCell>{translate('sulu_builder.template_modified')}</Table.HeaderCell>
+                    <Table.HeaderCell>{''}</Table.HeaderCell>
                 </Table.Header>
                 <Table.Body>
                     {this.templates.map((template) => (
                         <Table.Row key={template.id}>
-                            <Table.Cell>{template.key}</Table.Cell>
+                            <Table.Cell>
+                                <button
+                                    className={builderStyles.keyButton}
+                                    onClick={() => this.handleEdit(template.type, template.key)}
+                                    type="button"
+                                >
+                                    {template.key}
+                                </button>
+                            </Table.Cell>
                             <Table.Cell>{template.type}</Table.Cell>
                             <Table.Cell>{template.path}</Table.Cell>
                             <Table.Cell>{new Date(template.modified).toLocaleString()}</Table.Cell>
+                            <Table.Cell>
+                                <button
+                                    aria-label={translate('sulu_builder.edit')}
+                                    className={builderStyles.editButton}
+                                    onClick={() => this.handleEdit(template.type, template.key)}
+                                    title={translate('sulu_builder.edit')}
+                                    type="button"
+                                >
+                                    <Icon name="su-pen" />
+                                </button>
+                            </Table.Cell>
                         </Table.Row>
                     ))}
                 </Table.Body>

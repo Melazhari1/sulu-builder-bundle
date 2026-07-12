@@ -15,6 +15,63 @@
     color: #999;
 }
 
+.messageError {
+    color: #e5544e;
+    margin: 0 0 20px;
+}
+
+.messageSuccess {
+    color: #6a9d20;
+    margin: 0 0 20px;
+}
+
+.titleSuffix {
+    color: #999;
+    font-size: 18px;
+}
+
+.keyButton {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.editButton {
+    background: none;
+    border: 0;
+    padding: 0 5px;
+    color: inherit;
+    cursor: pointer;
+}
+
+.editor {
+    width: 100%;
+    min-height: 60vh;
+    padding: 15px;
+    border: 1px solid #e5e5e5;
+    border-radius: 3px;
+    background: #fff;
+    color: #262626;
+    font-family: Consolas, Monaco, 'Andale Mono', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    resize: vertical;
+    tab-size: 4;
+
+    &:focus {
+        border-color: #52b6ca;
+        outline: none;
+    }
+
+    &:disabled {
+        opacity: 0.6;
+    }
+}
+
 .loaderContainer {
     display: flex;
     justify-content: center;

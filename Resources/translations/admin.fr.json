@@ -8,5 +8,9 @@
     "sulu_builder.template_type": "Type",
     "sulu_builder.template_path": "Chemin",
     "sulu_builder.template_size": "Taille",
-    "sulu_builder.template_modified": "Dernière modification"
+    "sulu_builder.template_modified": "Dernière modification",
+    "sulu_builder.edit": "Modifier le template",
+    "sulu_builder.template_load_error": "Le template n'a pas pu être chargé.",
+    "sulu_builder.save_success": "Template enregistré.",
+    "sulu_builder.save_error": "Le template n'a pas pu être enregistré. Vérifiez que le XML est bien formé."
 }

@@ -12,4 +12,10 @@ const builderConfig = {
     },
 };
 
+export function templateUrl(type: string, key: string): string {
+    return builderConfig.endpoints.templates
+        + '/' + encodeURIComponent(type)
+        + '/' + encodeURIComponent(key);
+}
+
 export default builderConfig;

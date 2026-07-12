@@ -1,10 +1,10 @@
 # SuluBuilderBundle
 
 A production-ready Sulu CMS bundle that adds a **"Sulu Builder"** top-level item to the
-Sulu Administration navigation. The view lists the XML templates of your project
-(pages, snippets, … — configurable) through a native Sulu Admin React view, and ships a
-JSON admin API to read and write those templates, ready to be extended into a full
-visual template builder.
+Sulu Administration navigation. It lists the XML templates of your project (pages,
+snippets, … — configurable), lets you **edit and save them** in a native Sulu Admin
+editor view (with well-formed-XML validation on save), and ships the underlying JSON
+admin API — ready to be extended into a full visual template builder.
 
 - Compatible with **Sulu 2.4 – 2.6**, PHP >= 7.2, Symfony 5.4 / 6.x
 - PSR-4 / PSR-12 compliant
@@ -51,8 +51,10 @@ SuluBuilderBundle/
         ├── index.js                           Registers the view in Sulu's viewRegistry and the config hook
         ├── config.js                          Endpoint config, filled at boot from BuilderAdmin::getConfig()
         └── views/
-            ├── Builder.js                     React view (mobx + Sulu components: Breadcrumb, Table,
-            │                                  Loader, withToolbar) — the "Sulu Builder" page
+            ├── Builder.js                     List view (mobx + Sulu components: Breadcrumb, Table,
+            │                                  Icon, Loader, withToolbar) — the "Sulu Builder" page
+            ├── BuilderEdit.js                 XML editor view ("/builder/:type/:key"): load, edit and
+            │                                  save a template via the admin API (toolbar Save button)
             └── builder.scss                   View styles (CSS modules, native Sulu spacing)
 ```
 
@@ -121,12 +123,13 @@ project uses for the routing import.
 ## 5. Extending
 
 - **New template types**: add a directory to `sulu_builder.template_directories`.
-- **New views** (e.g. an edit view): add a `createViewBuilder()` call in
+- **New views**: add a `createViewBuilder()` call in
   `BuilderAdmin::configureViews()` and register the matching React component in
-  `Resources/js/index.js`.
-- **Visual builder**: the existing standalone XML builder UI can be ported into
-  `Resources/js/views/` as additional React components; the load/save API is already
-  in place.
+  `Resources/js/index.js` — the list ("/builder") and editor ("/builder/:type/:key")
+  views show the pattern.
+- **Visual builder**: the XML editor in `BuilderEdit.js` is a plain (dependency-free)
+  code textarea; it can be swapped for a richer editor or a drag-and-drop builder —
+  the load/save API and the view wiring stay the same.
 
 ## Theming & responsiveness
 

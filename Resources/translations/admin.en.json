@@ -8,5 +8,9 @@
     "sulu_builder.template_type": "Type",
     "sulu_builder.template_path": "Path",
     "sulu_builder.template_size": "Size",
-    "sulu_builder.template_modified": "Last modified"
+    "sulu_builder.template_modified": "Last modified",
+    "sulu_builder.edit": "Edit template",
+    "sulu_builder.template_load_error": "The template could not be loaded.",
+    "sulu_builder.save_success": "Template saved.",
+    "sulu_builder.save_error": "The template could not be saved. Check that the XML is well-formed."
 }
