@@ -84,8 +84,9 @@ php vendor/melazhari/sulu-builder-bundle/install.php   # add --dry-run to previe
 ```
 
 It registers the bundle, auto-detects the admin prefix, creates the routing/config
-files and wires the frontend package. Only `npm run build`, `cache:clear` and the
-permission grant remain manual.
+files and adds a relative import of the frontend sources to the admin entry point
+(no npm linking — use `--npm` if you prefer a `file:` dependency). Only
+`npm run build`, `cache:clear` and the permission grant remain manual.
 
 The admin URL prefix is **dynamic**: the API routes take whatever prefix you choose
 when importing `Resources/config/routing_api.yml` (default `/admin/api`), and the

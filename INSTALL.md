@@ -20,14 +20,16 @@ php vendor/melazhari/sulu-builder-bundle/install.php
 
 It performs steps 2–4 and the configuration edits of step 6 automatically:
 registers the bundle in `config/bundles.php`, **auto-detects the admin prefix** from
-`config/routes/sulu_admin.yaml`, creates the routes and package config files, adds the
-npm dependency to `assets/admin/package.json` and the import to the admin entry point.
+`config/routes/sulu_admin.yaml`, creates the routes and package config files, and adds
+a **relative import** of the bundle's `Resources/js` to the admin entry point (webpack
+resolves the sources directly — no npm linking, so it also works in Docker setups).
 It is idempotent (safe to re-run; existing entries are skipped) and supports:
 
 ```bash
 php vendor/melazhari/sulu-builder-bundle/install.php --dry-run              # preview only
 php vendor/melazhari/sulu-builder-bundle/install.php --project-dir=/path    # explicit project root
 php vendor/melazhari/sulu-builder-bundle/install.php --admin-prefix=/backend # override detection
+php vendor/melazhari/sulu-builder-bundle/install.php --npm                  # use a "file:" npm dependency instead
 ```
 
 Afterwards only steps 5 (cache), 6's build commands (`npm install && npm run build`)
@@ -114,8 +116,18 @@ bin/console cache:clear
 
 ## 6. Build the Administration frontend
 
-In `assets/admin/package.json` add the dependency (path relative to `assets/admin`;
-adapt it if you installed via Option B):
+**Recommended — relative import** (what `install.php` does by default; no npm linking
+involved, immune to Docker path/symlink issues): in `assets/admin/app.js` (or
+`index.js`, depending on your skeleton version) add — path relative to `assets/admin`,
+adapt it if you installed via Option B:
+
+```js
+// existing imports…
+import '../../vendor/melazhari/sulu-builder-bundle/Resources/js';
+```
+
+**Alternative — npm package** (`install.php --npm`): add the dependency to
+`assets/admin/package.json`:
 
 ```json
 {
@@ -125,10 +137,10 @@ adapt it if you installed via Option B):
 }
 ```
 
-In `assets/admin/app.js` (or `index.js`, depending on your skeleton version):
+and import it in the entry point (**requires `npm install` afterwards**, which creates
+the `node_modules` link):
 
 ```js
-// existing imports…
 import 'sulu-builder-bundle';
 ```
 
@@ -162,5 +174,10 @@ item stays hidden for users without *View*.
 
 - **Menu item missing** → permission not granted (step 7) or cache not cleared (step 5).
 - **Blank view / "view not found" in console** → frontend not rebuilt (step 6) or the
-  `import 'sulu-builder-bundle';` line is missing.
+  import line is missing from the admin entry point.
+- **`Module not found: Error: Can't resolve 'sulu-builder-bundle'`** → you used the npm
+  variant but never ran `npm install` after adding the dependency, or the `file:` path
+  in `package.json` doesn't exist from `assets/admin` (typical in Docker when the bundle
+  lives elsewhere in the container). Fix the path and `npm install`, or switch to the
+  relative import variant, which avoids this entirely.
 - **404 on the API** → routes file missing or wrong prefix (step 3).

@@ -17,6 +17,8 @@
  * Options:
  *     --project-dir=<path>   Sulu project root (default: current directory)
  *     --admin-prefix=<path>  Admin URL prefix (default: auto-detected, "/admin")
+ *     --npm                  Wire the frontend as an npm "file:" dependency instead
+ *                            of the default relative import (requires npm install)
  *     --dry-run              Show what would be changed without writing anything
  *     --help                 Show this help
  *
@@ -25,8 +27,10 @@
  *   2. Detects the admin prefix from config/routes/sulu_admin.yaml
  *   3. Creates config/routes/sulu_builder_admin.yaml with "<prefix>/api"
  *   4. Creates config/packages/sulu_builder.yaml (commented defaults)
- *   5. Adds the "sulu-builder-bundle" dependency to assets/admin/package.json
- *   6. Adds the import to the admin entry point (assets/admin/app.js or index.js)
+ *   5. Adds a relative import of the bundle's Resources/js to the admin entry
+ *      point (assets/admin/app.js or index.js) — webpack resolves the sources
+ *      directly, no npm linking involved. With --npm it instead adds a
+ *      "file:" dependency to assets/admin/package.json plus a bare import.
  *
  * Remaining manual steps are printed at the end (npm build, cache:clear, permissions).
  */
@@ -41,18 +45,24 @@ if ('cli' !== \PHP_SAPI) {
 $options = [
     'project-dir' => \getcwd(),
     'admin-prefix' => null,
+    'npm' => false,
     'dry-run' => false,
 ];
 
 foreach (\array_slice($argv, 1) as $argument) {
     if ('--help' === $argument || '-h' === $argument) {
-        echo "Usage: php install.php [--project-dir=<path>] [--admin-prefix=/admin] [--dry-run]\n";
+        echo "Usage: php install.php [--project-dir=<path>] [--admin-prefix=/admin] [--npm] [--dry-run]\n";
         echo "Configures a Sulu 2.x project for the SuluBuilderBundle (see INSTALL.md).\n";
         exit(0);
     }
 
     if ('--dry-run' === $argument) {
         $options['dry-run'] = true;
+        continue;
+    }
+
+    if ('--npm' === $argument) {
+        $options['npm'] = true;
         continue;
     }
 
@@ -72,7 +82,7 @@ foreach (\array_slice($argv, 1) as $argument) {
 /**
  * @return void
  */
-function fail($message)
+function fail(string $message)
 {
     \fwrite(\STDERR, '[ERROR] ' . $message . "\n");
     exit(1);
@@ -81,7 +91,7 @@ function fail($message)
 /**
  * @return void
  */
-function info($status, $message)
+function info(string $status, string $message)
 {
     echo \sprintf("[%s] %s\n", $status, $message);
 }
@@ -89,7 +99,7 @@ function info($status, $message)
 /**
  * @return void
  */
-function writeFileChecked($path, $content, $dryRun)
+function writeFileChecked(string $path, string $content, bool $dryRun)
 {
     if ($dryRun) {
         info('DRY', \sprintf('Would write %s', $path));
@@ -112,7 +122,7 @@ function writeFileChecked($path, $content, $dryRun)
  *
  * @return string
  */
-function relativePath($from, $to)
+function relativePath(string $from, string $to)
 {
     $normalize = static function ($path) {
         $real = \realpath($path);
@@ -230,12 +240,19 @@ if (\is_file($packageFile)) {
 }
 
 /*
- * 5. Add the npm dependency to assets/admin/package.json
+ * 5. Wire the frontend.
+ *
+ * Default: relative import of the bundle sources in the admin entry point —
+ * webpack resolves them directly, no npm linking involved (immune to Docker
+ * path and symlink issues). With --npm: "file:" dependency + bare import.
  */
 $adminAssetsDir = $projectDir . '/assets/admin';
+$useNpm = $options['npm'];
 $packageJsonFile = $adminAssetsDir . '/package.json';
 
-if (!\is_file($packageJsonFile)) {
+if (!$useNpm) {
+    info('INFO', 'Frontend strategy: relative import (default) — package.json untouched; use --npm for a "file:" dependency');
+} elseif (!\is_file($packageJsonFile)) {
     info('WARN', 'assets/admin/package.json not found — add the npm dependency manually (INSTALL.md step 6)');
 } else {
     $packageJson = \json_decode((string) \file_get_contents($packageJsonFile), true);
@@ -277,10 +294,19 @@ if (null === $entryPoint) {
     $entryContent = (string) \file_get_contents($entryPoint);
     $entryName = 'assets/admin/' . \basename($entryPoint);
 
-    if (false !== \strpos($entryContent, 'sulu-builder-bundle')) {
+    if ($useNpm) {
+        $importTarget = 'sulu-builder-bundle';
+    } else {
+        $importTarget = relativePath($adminAssetsDir, $bundleDir . '/Resources/js');
+        if (0 !== \strpos($importTarget, '.')) {
+            $importTarget = './' . $importTarget;
+        }
+    }
+
+    if (false !== \strpos($entryContent, 'sulu-builder-bundle') || false !== \strpos($entryContent, $importTarget)) {
         info('SKIP', \sprintf('%s — import already present', $entryName));
     } else {
-        $importLine = "import 'sulu-builder-bundle';";
+        $importLine = "import '" . $importTarget . "';";
 
         if (\preg_match_all('/^import\s.*$/m', $entryContent, $matches, \PREG_OFFSET_CAPTURE) > 0) {
             $lastImport = \end($matches[0]);
