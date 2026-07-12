@@ -2,9 +2,9 @@
 
 A production-ready Sulu CMS bundle that adds a **"Sulu Builder"** top-level item to the
 Sulu Administration navigation. It lists the XML templates of your project (pages,
-snippets, … — configurable), lets you **edit and save them** in a native Sulu Admin
-editor view (with well-formed-XML validation on save), and ships the underlying JSON
-admin API — ready to be extended into a full visual template builder.
+snippets, … — configurable) and lets you **create, edit, import and save them with the
+embedded builderxml visual builder** (drag-and-drop designer with XML generate/import),
+backed by a JSON admin API with well-formed-XML validation on save.
 
 - Compatible with **Sulu 2.4 – 2.6**, PHP >= 7.2, Symfony 5.4 / 6.x
 - PSR-4 / PSR-12 compliant
@@ -46,6 +46,10 @@ SuluBuilderBundle/
     ├── translations/
     │   ├── admin.en.json                      Admin UI translations (Symfony "admin" domain — picked up
     │   └── admin.fr.json                      automatically by the Sulu admin translation endpoint)
+    ├── public/
+    │   └── builder/                           Embedded visual builder (copy of the builderxml app plus
+    │                                          js/suluBridge.js, the postMessage bridge) — published to
+    │                                          public/bundles/sulubuilder/ by "bin/console assets:install"
     └── js/                                    Frontend package compiled by the Sulu admin webpack build
         ├── package.json                       npm package manifest ("sulu-builder-bundle")
         ├── index.js                           Registers the view in Sulu's viewRegistry and the config hook
@@ -53,10 +57,14 @@ SuluBuilderBundle/
         └── views/
             ├── Builder.js                     List view (mobx + Sulu components: Breadcrumb, Table,
             │                                  Icon, Loader, withToolbar) — the "Sulu Builder" page
-            ├── BuilderEdit.js                 XML editor view ("/builder/:type/:key"): load, edit and
-            │                                  save a template via the admin API (toolbar Save button)
+            ├── BuilderEdit.js                 Editor view ("/builder/add" and "/builder/:type/:key"):
+            │                                  embeds the visual builder in an iframe and loads/saves
+            │                                  through the postMessage bridge + admin API
             └── builder.scss                   View styles (CSS modules, native Sulu spacing)
 ```
+
+(`tests/bridge-test.html` is a standalone browser test of the postMessage bridge —
+open it over HTTP and it prints PASS/FAIL lines.)
 
 How the pieces connect:
 
@@ -69,8 +77,13 @@ How the pieces connect:
    them to the frontend at boot time (`initializer.addUpdateConfigHook` in
    `Resources/js/index.js`) — so the admin prefix (`/admin` by default) is **dynamic**,
    never hard-coded in JavaScript.
-5. The React view calls the templates endpoint, handled by
+5. The React views call the templates endpoint, handled by
    `TemplateController` → `TemplateXmlManager`.
+6. The editor view embeds `Resources/public/builder/index.html` (the builderxml app)
+   in an iframe; `suluBridge.js` inside the app answers `sulu-builder:load` /
+   `sulu-builder:new` / `sulu-builder:request-xml` postMessages, so the same visual
+   builder is used to create, edit and import templates, and Save round-trips
+   through the admin API.
 
 ---
 

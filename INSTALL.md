@@ -108,11 +108,16 @@ sulu_builder:
         form: config/templates/forms
 ```
 
-## 5. Clear the cache
+## 5. Publish assets and clear the cache
 
 ```bash
+bin/console assets:install public
 bin/console cache:clear
 ```
+
+`assets:install` publishes the embedded visual builder (the builderxml app) to
+`public/bundles/sulubuilder/builder/`. Without it, the template editor view shows
+"The visual builder could not be loaded".
 
 ## 6. Build the Administration frontend
 
@@ -168,7 +173,10 @@ item stays hidden for users without *View*.
 
 1. Log into the Administration — a **"Sulu Builder"** item appears in the main navigation.
 2. Clicking it opens the view at `<admin-prefix>/#/builder` and lists your XML templates.
-3. `GET <admin-prefix>/api/builder/templates` (logged in) returns JSON.
+3. Clicking a template (or the pen icon) opens the **visual builder** for it; the
+   toolbar's **New template** button starts a fresh one. The builder's own
+   "Import XML" button accepts pasted or uploaded XML.
+4. `GET <admin-prefix>/api/builder/templates` (logged in) returns JSON.
 
 ## Troubleshooting
 

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>suluBridge postMessage test</title>
+</head>
+<body>
+<pre id="test-out">RUNNING</pre>
+<iframe id="frame" src="../Resources/public/builder/index.html" style="width:900px;height:500px"></iframe>
+<script>
+(function() {
+    var out = [];
+    var frame = document.getElementById('frame');
+    var origin = window.location.origin;
+    var waiters = [];
+
+    function report(name, ok, detail) {
+        out.push((ok ? 'PASS' : 'FAIL') + ' ' + name + (detail ? ' — ' + detail : ''));
+    }
+
+    function finish() {
+        document.getElementById('test-out').textContent = out.join('\n') + '\nDONE';
+    }
+
+    function waitFor(type, timeoutMs) {
+        return new Promise(function(resolve) {
+            var timer = setTimeout(function() { resolve(null); }, timeoutMs || 5000);
+            waiters.push({type: type, resolve: function(data) { clearTimeout(timer); resolve(data); }});
+        });
+    }
+
+    window.addEventListener('message', function(event) {
+        if (event.origin !== origin || !event.data || typeof event.data !== 'object') return;
+        for (var i = 0; i < waiters.length; i++) {
+            if (waiters[i].type === event.data.type) {
+                var waiter = waiters.splice(i, 1)[0];
+                waiter.resolve(event.data);
+                return;
+            }
+        }
+    });
+
+    function post(message) {
+        frame.contentWindow.postMessage(message, origin);
+    }
+
+    var sampleXml = '<?xml version="1.0" ?>\n'
+        + '<template xmlns="http://schemas.sulu.io/template/template">\n'
+        + '    <key>testpage</key>\n'
+        + '    <view>pages/testpage</view>\n'
+        + '    <controller>Sulu\\Bundle\\WebsiteBundle\\Controller\\DefaultController::indexAction</controller>\n'
+        + '    <cacheLifetime>86400</cacheLifetime>\n'
+        + '    <properties>\n'
+        + '        <property name="title" type="text_line" mandatory="true"/>\n'
+        + '    </properties>\n'
+        + '</template>';
+
+    (async function run() {
+        var ready = await waitFor('sulu-builder:ready', 8000);
+        report('ready message received', !!ready);
+        if (!ready) { finish(); return; }
+
+        post({type: 'sulu-builder:load', xml: sampleXml});
+        post({type: 'sulu-builder:request-xml'});
+        var loaded = await waitFor('sulu-builder:xml');
+        report('load + request-xml round trip', !!loaded);
+        if (loaded) {
+            report('imported key preserved', loaded.key === 'testpage', 'key=' + loaded.key);
+            report('templateType is page', loaded.templateType === 'page', 'type=' + loaded.templateType);
+            report('generated xml contains title property',
+                loaded.xml.indexOf('name="title"') !== -1 && loaded.xml.indexOf('<key>testpage</key>') !== -1);
+        }
+
+        post({type: 'sulu-builder:load', xml: '<not-valid'});
+        var error = await waitFor('sulu-builder:error');
+        report('invalid xml reports error', !!error, error ? error.message.split('\n')[0] : 'no message');
+
+        post({type: 'sulu-builder:new'});
+        post({type: 'sulu-builder:request-xml'});
+        var fresh = await waitFor('sulu-builder:xml');
+        report('new project after sulu-builder:new', !!fresh && fresh.key === 'default',
+            fresh ? 'key=' + fresh.key : 'no reply');
+
+        finish();
+    })();
+})();
+</script>
+</body>
+</html>

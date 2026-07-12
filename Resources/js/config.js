@@ -10,6 +10,8 @@ const builderConfig = {
     endpoints: {
         templates: '/admin/api/builder/templates',
     },
+    // Embedded visual builder, published by "bin/console assets:install".
+    builderUrl: '/bundles/sulubuilder/builder/index.html',
 };
 
 export function templateUrl(type: string, key: string): string {

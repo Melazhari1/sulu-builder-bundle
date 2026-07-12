@@ -29,6 +29,10 @@ class Builder extends React.Component<{}> {
         this.props.router.navigate('sulu_builder.builder_edit', {type, key});
     };
 
+    handleAdd = () => {
+        this.props.router.navigate('sulu_builder.builder_add');
+    };
+
     @action load = () => {
         this.loading = true;
         this.error = false;
@@ -116,6 +120,12 @@ class Builder extends React.Component<{}> {
 export default withToolbar(Builder, function() {
     return {
         items: [
+            {
+                type: 'button',
+                label: translate('sulu_admin.add'),
+                icon: 'su-plus-circle',
+                onClick: this.handleAdd,
+            },
             {
                 type: 'button',
                 label: translate('sulu_builder.reload'),

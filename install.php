@@ -351,8 +351,9 @@ if (null === $entryPoint) {
  */
 echo "\nDone. Remaining manual steps:\n";
 echo "  1. Build the admin frontend:   cd assets/admin && npm install && npm run build\n";
-echo "  2. Clear the cache:            bin/console cache:clear\n";
-echo "  3. Grant permissions:          Administration > Settings > User roles > \"Sulu Builder\"\n";
+echo "  2. Publish the bundle assets:  bin/console assets:install public\n";
+echo "  3. Clear the cache:            bin/console cache:clear\n";
+echo "  4. Grant permissions:          Administration > Settings > User roles > \"Sulu Builder\"\n";
 
 if ($dryRun) {
     echo "\n(dry run — no files were changed)\n";

@@ -48,6 +48,16 @@
     cursor: pointer;
 }
 
+.builderFrame {
+    display: block;
+    width: 100%;
+    height: calc(100vh - 230px);
+    min-height: 500px;
+    border: 1px solid #e5e5e5;
+    border-radius: 3px;
+    background: #fff;
+}
+
 .editor {
     width: 100%;
     min-height: 60vh;

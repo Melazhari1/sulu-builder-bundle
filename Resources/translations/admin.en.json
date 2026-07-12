@@ -12,5 +12,7 @@
     "sulu_builder.edit": "Edit template",
     "sulu_builder.template_load_error": "The template could not be loaded.",
     "sulu_builder.save_success": "Template saved.",
-    "sulu_builder.save_error": "The template could not be saved. Check that the XML is well-formed."
+    "sulu_builder.save_error": "The template could not be saved. Check that the XML is well-formed.",
+    "sulu_builder.add": "New template",
+    "sulu_builder.builder_unreachable": "The visual builder could not be loaded. Run \"bin/console assets:install public\" and reload this page."
 }

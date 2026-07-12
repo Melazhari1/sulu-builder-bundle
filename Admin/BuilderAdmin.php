@@ -34,6 +34,8 @@ class BuilderAdmin extends Admin
 
     public const EDIT_VIEW = 'sulu_builder.builder_edit';
 
+    public const ADD_VIEW = 'sulu_builder.builder_add';
+
     /**
      * @var ViewBuilderFactoryInterface
      */
@@ -84,6 +86,13 @@ class BuilderAdmin extends Admin
                 ->createViewBuilder(static::BUILDER_VIEW, '/builder', static::BUILDER_VIEW)
         );
 
+        // The add view reuses the edit view component; it detects "add mode"
+        // by the absence of the type/key route attributes.
+        $viewCollection->add(
+            $this->viewBuilderFactory
+                ->createViewBuilder(static::ADD_VIEW, '/builder/add', static::EDIT_VIEW)
+        );
+
         $viewCollection->add(
             $this->viewBuilderFactory
                 ->createViewBuilder(static::EDIT_VIEW, '/builder/:type/:key', static::EDIT_VIEW)
@@ -124,6 +133,8 @@ class BuilderAdmin extends Admin
             'endpoints' => [
                 'templates' => $templatesUrl,
             ],
+            // Published by "bin/console assets:install" from Resources/public.
+            'builderUrl' => '/bundles/sulubuilder/builder/index.html',
         ];
     }
 

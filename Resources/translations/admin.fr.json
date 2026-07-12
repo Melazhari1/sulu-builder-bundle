@@ -12,5 +12,7 @@
     "sulu_builder.edit": "Modifier le template",
     "sulu_builder.template_load_error": "Le template n'a pas pu être chargé.",
     "sulu_builder.save_success": "Template enregistré.",
-    "sulu_builder.save_error": "Le template n'a pas pu être enregistré. Vérifiez que le XML est bien formé."
+    "sulu_builder.save_error": "Le template n'a pas pu être enregistré. Vérifiez que le XML est bien formé.",
+    "sulu_builder.add": "Nouveau template",
+    "sulu_builder.builder_unreachable": "Le builder visuel n'a pas pu être chargé. Exécutez \"bin/console assets:install public\" puis rechargez la page."
 }

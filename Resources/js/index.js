@@ -16,4 +16,7 @@ initializer.addUpdateConfigHook('sulu_builder', (config) => {
     if (config && config.endpoints) {
         builderConfig.endpoints = {...builderConfig.endpoints, ...config.endpoints};
     }
+    if (config && config.builderUrl) {
+        builderConfig.builderUrl = config.builderUrl;
+    }
 });
