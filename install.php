@@ -297,9 +297,34 @@ if (null === $entryPoint) {
     if ($useNpm) {
         $importTarget = 'sulu-builder-bundle';
     } else {
-        $importTarget = relativePath($adminAssetsDir, $bundleDir . '/Resources/js');
-        if (0 !== \strpos($importTarget, '.')) {
-            $importTarget = './' . $importTarget;
+        // Prefer the vendor location: it is stable and inside the project, so it
+        // also resolves in containers that only mount the project directory.
+        // (__DIR__ resolves symlinks, so $bundleDir may point outside the project
+        // when composer symlinked a path repository into vendor/.)
+        $vendorPackageDir = $projectDir . '/vendor/melazhari/sulu-builder-bundle';
+
+        if (\is_file($vendorPackageDir . '/Resources/js/index.js')) {
+            $importTarget = '../../vendor/melazhari/sulu-builder-bundle/Resources/js';
+        } else {
+            $importTarget = relativePath($adminAssetsDir, $bundleDir . '/Resources/js');
+            if (0 !== \strpos($importTarget, '.')) {
+                $importTarget = './' . $importTarget;
+            }
+        }
+
+        if (\is_link($vendorPackageDir)) {
+            info('WARN', 'vendor/melazhari/sulu-builder-bundle is a symlink (composer path repository). '
+                . 'If the admin build runs in a container where the link target does not exist, it fails with '
+                . '"Cannot find module" — set {"options": {"symlink": false}} on the path repository and run '
+                . '"composer update melazhari/sulu-builder-bundle" to copy the sources instead.');
+        }
+
+        if (!\is_file($adminAssetsDir . '/' . $importTarget . '/index.js')) {
+            info('WARN', \sprintf(
+                '"%s" does not resolve from assets/admin — the admin build will fail with "Cannot find module". '
+                . 'See the troubleshooting section of INSTALL.md.',
+                $importTarget
+            ));
         }
     }
 

@@ -180,4 +180,20 @@ item stays hidden for users without *View*.
   in `package.json` doesn't exist from `assets/admin` (typical in Docker when the bundle
   lives elsewhere in the container). Fix the path and `npm install`, or switch to the
   relative import variant, which avoids this entirely.
+- **`Cannot find module '../../vendor/melazhari/sulu-builder-bundle/Resources/js'`**
+  (in the browser via `webpackMissingModule`, or "Module not found" during the build) →
+  that path does not exist from `assets/admin` in the environment where the build runs.
+  Check `ls -la vendor/melazhari/` from the project root **in that environment**:
+  - *nothing there* → `composer require`/`composer install` was never run there, or the
+    bundle lives elsewhere (e.g. `bundles/SuluBuilderBundle`) — point the import at the
+    real location.
+  - *a symlink pointing outside the project* → composer path repositories symlink by
+    default, and the link breaks inside containers. Set
+    `{ "type": "path", "url": "...", "options": { "symlink": false } }` in the project's
+    `composer.json` and run `composer update melazhari/sulu-builder-bundle` so the
+    sources are copied into `vendor/`.
+  - *directory exists* → case mismatch in the import path (Linux is case-sensitive):
+    it must read exactly `Resources/js`.
+
+  `install.php` detects the symlink and missing-target cases and prints a warning.
 - **404 on the API** → routes file missing or wrong prefix (step 3).
