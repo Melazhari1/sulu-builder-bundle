@@ -19,6 +19,7 @@ visual template builder.
 SuluBuilderBundle/
 ├── composer.json                              Package definition (type: symfony-bundle, PSR-4: Xxp\SuluBuilderBundle\)
 ├── INSTALL.md                                 Step-by-step installation instructions
+├── install.php                                CLI installer: configures a Sulu project automatically (idempotent)
 ├── SuluBuilderBundle.php                      Bundle class (entry point registered in config/bundles.php)
 │
 ├── Admin/
@@ -75,6 +76,16 @@ How the pieces connect:
 
 Full step-by-step instructions (composer, bundle registration, routing, frontend
 build, permissions, troubleshooting) live in **[INSTALL.md](INSTALL.md)**.
+
+Most of the configuration can be done automatically — after `composer require`, run:
+
+```bash
+php vendor/melazhari/sulu-builder-bundle/install.php   # add --dry-run to preview
+```
+
+It registers the bundle, auto-detects the admin prefix, creates the routing/config
+files and wires the frontend package. Only `npm run build`, `cache:clear` and the
+permission grant remain manual.
 
 The admin URL prefix is **dynamic**: the API routes take whatever prefix you choose
 when importing `Resources/config/routing_api.yml` (default `/admin/api`), and the

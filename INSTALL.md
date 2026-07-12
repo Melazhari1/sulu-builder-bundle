@@ -9,6 +9,31 @@ Symfony 5.4 / 6.x).
 > Sulu Administration somewhere else (e.g. `/backend`), just adjust the prefix in
 > step 3 — no code change needed.
 
+## Quick install (automatic)
+
+After requiring the bundle with composer (step 1 below), run the bundled installer
+from your project root:
+
+```bash
+php vendor/melazhari/sulu-builder-bundle/install.php
+```
+
+It performs steps 2–4 and the configuration edits of step 6 automatically:
+registers the bundle in `config/bundles.php`, **auto-detects the admin prefix** from
+`config/routes/sulu_admin.yaml`, creates the routes and package config files, adds the
+npm dependency to `assets/admin/package.json` and the import to the admin entry point.
+It is idempotent (safe to re-run; existing entries are skipped) and supports:
+
+```bash
+php vendor/melazhari/sulu-builder-bundle/install.php --dry-run              # preview only
+php vendor/melazhari/sulu-builder-bundle/install.php --project-dir=/path    # explicit project root
+php vendor/melazhari/sulu-builder-bundle/install.php --admin-prefix=/backend # override detection
+```
+
+Afterwards only steps 5 (cache), 6's build commands (`npm install && npm run build`)
+and 7 (permissions) remain — the installer prints them as a reminder. If you prefer to
+configure everything by hand, follow the steps below and skip the installer.
+
 ## 1. Require the bundle
 
 **Option A — from GitHub (recommended):** add to your project's `composer.json`:
